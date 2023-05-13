@@ -2,8 +2,7 @@
 Deploys and configures a secure DevSecOps architecture consisting of GitLab CE and AWS managed services. Primarily meant for small-scale use with the Docker executor. 
 
 Loosely based on GitLab docs like the following, but modified to be more secure 
-
-https://docs.gitlab.com/ee/install/aws/manual_install_aws.html 
+<br>https://docs.gitlab.com/ee/install/aws/manual_install_aws.html 
 
 
 ### FEATURES:
@@ -28,8 +27,8 @@ https://docs.gitlab.com/ee/install/aws/manual_install_aws.html
 ### TO RUN:
 - Git clone the repo to your home directory (you will have to alter the ansible_role_dir var in dev.auto.tfvars if you clone it elsewhere) 
 - Run the setup.sh script to generate an SSH key, download the necessary packages and container images, and set up the certs for VPN authentication 
-  **Note: There are a number of prompts (including for your sudo password and Iron Bank credentials), so stay close
-  **Note2: It will download about 2GB of GitLab and Docker packages to your machine
+  <br>**Note: There are a number of prompts (including for your sudo password and Iron Bank credentials), so stay close
+  <br>**Note2: It will download about 2GB of GitLab and Docker packages to your machine
 - Follow the instructions provided by the setup script to enter the necessary vars for your environment and run the Terraform 
 - Connect to the VPN by following the instructions from the setup script. Then run the Ansible
 - Once complete, log into the Rails server with the SSH key generated and set the root password with this command: <br>
