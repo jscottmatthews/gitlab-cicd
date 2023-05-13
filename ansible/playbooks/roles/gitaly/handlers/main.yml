@@ -1,0 +1,4 @@
+---
+# handlers file for gitaly
+  - name: reconfigure gitlab
+    shell: sudo gitlab-ctl reconfigure

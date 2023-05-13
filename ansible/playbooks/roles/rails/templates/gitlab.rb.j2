@@ -1,0 +1,70 @@
+
+## Connectivity
+
+external_url 'https://{{ rails_domain }}'
+
+nginx['listen_port'] = 80  
+ nginx['listen_https'] = false
+
+ nginx['proxy_set_headers'] = { 
+  "X-Forwarded-Proto" => "https", 
+  "X-Forwarded-Ssl" => "on", 
+ } 
+
+ letsencrypt['enable'] = false
+
+
+# Disable the built-in Postgres
+ postgresql['enable'] = false
+
+# Fill in the connection details
+gitlab_rails['db_adapter'] = "postgresql"
+gitlab_rails['db_encoding'] = "unicode"
+gitlab_rails['db_database'] = "gitlab"
+gitlab_rails['db_username'] = "gitlab"
+gitlab_rails['db_password'] = "{{ lookup('aws_ssm', '/dev/rds/password', region='us-east-1' ) }}"
+gitlab_rails['db_host'] = "{{ rds_domain }}"
+
+# Use the same token value configured on all Gitaly servers
+gitlab_rails['gitaly_token'] = "{{ lookup('aws_ssm', '/dev/gitaly/auth_token', region='us-east-1' ) }}"
+gitlab_shell['secret_token'] = "{{ lookup('aws_ssm', '/dev/gitaly/secret_token', region='us-east-1' ) }}"
+
+
+git_data_dirs({
+  'default'  => { 'gitaly_address' => 'tcp://{{ gitaly_domain }}:8075' },
+})
+
+
+# Consolidated object storage configuration
+gitlab_rails['object_store']['enabled'] = true
+gitlab_rails['object_store']['proxy_download'] = true
+gitlab_rails['object_store']['connection'] = {
+  'provider' => 'AWS',
+  'region' => 'us-east-1',
+  'use_iam_profile' => true
+}
+
+gitlab_rails['object_store']['objects']['artifacts']['bucket'] = "{{ bucket_name}}/artifacts"
+gitlab_rails['object_store']['objects']['external_diffs']['bucket'] = "{{ bucket_name}}/external_diffs"
+gitlab_rails['object_store']['objects']['lfs']['bucket'] = "{{ bucket_name}}/lfs"
+gitlab_rails['object_store']['objects']['uploads']['bucket'] = "{{ bucket_name}}/uploads"
+gitlab_rails['object_store']['objects']['packages']['bucket'] = 'gitlab-packages'
+gitlab_rails['object_store']['objects']['dependency_proxy']['bucket'] = 'gitlab-dependency-proxy'
+gitlab_rails['object_store']['objects']['terraform_state']['bucket'] = 'gitlab-terraform-state'
+gitlab_rails['object_store']['objects']['ci_secure_files']['bucket'] = 'gitlab-ci-secure-files'
+gitlab_rails['object_store']['objects']['pages']['bucket'] = 'gitlab-pages'
+
+
+gitlab_rails['backup_upload_connection'] = {
+  'provider' => 'AWS',
+  'region' => 'us-east-1',
+  'use_iam_profile' => true
+}
+gitlab_rails['backup_upload_remote_directory'] = "{{ bucket_name}}/backups"
+
+grafana['enable'] = true
+grafana['disable_login_form'] = false
+grafana['alerting_enabled'] = true
+
+
+

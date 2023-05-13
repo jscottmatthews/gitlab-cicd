@@ -1,0 +1,10 @@
+- hosts: gitaly
+  become: true
+  become_user: root
+  vars_files: 
+    - variables.yml
+
+  tasks: 
+  - name: configure gitaly server
+    include_role:
+      name: "{{ role_dir }}/roles/gitaly/"

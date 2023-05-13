@@ -1,0 +1,10 @@
+- hosts: rails
+  become: true
+  become_user: root
+  vars_files: 
+    - variables.yml
+
+  tasks: 
+  - name: configure rails server
+    include_role:
+      name: "{{ role_dir }}/roles/rails/"

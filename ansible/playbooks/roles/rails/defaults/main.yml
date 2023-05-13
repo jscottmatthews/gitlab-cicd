@@ -1,0 +1,4 @@
+---
+# defaults file for rails
+domain: gitlab.devops-testenv.com
+bucket_name: gitlabcicd-object-storage-bucket

@@ -1,0 +1,51 @@
+---
+# tasks file for runner
+- name: check for gitlab runner
+  stat:
+    path: /tmp/runner.deb
+  register: runner_deb
+
+- name: upload and install runner package
+  block: 
+    - name: copy over runner.deb
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../setup/gitlab-runner_amd64.deb"
+        dest: /tmp/runner.deb
+        mode: '0777'
+    - name: install runner
+      ansible.builtin.apt: 
+        deb: /tmp/runner.deb
+        state: present
+  when: not runner_deb.stat.exists
+
+- name: check for docker packages (using containerd as sample)
+  stat:
+    path: /tmp/docker/containerd.deb
+  register: docker_packages
+
+- name: upload and install docker packages and images
+  block:
+    - name: copy over packages
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../setup/docker"
+        dest: /tmp
+      with_fileglob:
+        - "{{ playbook_dir }}/../../setup/docker/*"
+    - name: install docker
+      ansible.builtin.apt: 
+        deb: "/tmp/docker/{{ item }}"
+        state: present
+        allow_unauthenticated: true
+      loop: 
+        - containerd.deb
+        - docker-ce-cli.deb
+        - docker-ce.deb
+        - docker-compose-plugin.deb
+        - docker-buildx-plugin.deb
+  when: not docker_packages.stat.exists
+
+- name: load docker images
+  ansible.builtin.shell: "docker load -i {{ item }}"
+  loop: 
+    - /tmp/docker/buildah.tar 
+    - /tmp/docker/ubi8-min.tar

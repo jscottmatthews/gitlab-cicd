@@ -1,0 +1,19 @@
+# copy this into the config.toml file after registering a runner with this command:
+# sudo gitlab-runner register --url https://gitlab.devops-testenv.com/ --registration-token TOKEN --name fargate-runner --run-untagged --executor custom -n
+# it should go right below the executor = "custom" line
+# and yes, i know this is ugly. working on fully automating the runner setup process
+
+###
+
+  builds_dir = "/opt/gitlab-runner/builds"
+  cache_dir = "/opt/gitlab-runner/cache"
+  [runners.custom]
+    volumes = ["/cache", "/path/to-ca-cert-dir/ca.crt:/etc/gitlab-runner/certs/ca.crt:ro"]
+    config_exec = "/opt/gitlab-runner/fargate"
+    config_args = ["--config", "/etc/gitlab-runner/fargate.toml", "custom", "config"]
+    prepare_exec = "/opt/gitlab-runner/fargate"
+    prepare_args = ["--config", "/etc/gitlab-runner/fargate.toml", "custom", "prepare"]
+    run_exec = "/opt/gitlab-runner/fargate"
+    run_args = ["--config", "/etc/gitlab-runner/fargate.toml", "custom", "run"]
+    cleanup_exec = "/opt/gitlab-runner/fargate"
+    cleanup_args = ["--config", "/etc/gitlab-runner/fargate.toml", "custom", "cleanup"]

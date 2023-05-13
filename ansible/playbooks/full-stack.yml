@@ -1,0 +1,4 @@
+---
+- import_playbook: gitaly.yml
+- import_playbook: rails.yml
+- import_playbook: runner.yml

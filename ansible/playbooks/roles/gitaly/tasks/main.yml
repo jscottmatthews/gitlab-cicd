@@ -1,0 +1,39 @@
+---
+# tasks file for gitaly
+- name: check for gitlab package
+  stat:
+    path: /tmp/gitlab.deb
+  register: gitlab_deb
+
+- name: upload and install gitlab package
+  block: 
+    - name: copy over gitlab.deb
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../setup/gitlab.deb"
+        dest: /tmp/gitlab.deb
+        mode: '0777'
+    - name: install gitlab
+      ansible.builtin.apt: 
+        deb: /tmp/gitlab.deb
+        state: present
+  when: not gitlab_deb.stat.exists
+
+- name: open firewall ports
+  community.general.ufw: 
+    rule: allow
+    port: "{{ item }}"
+  loop:
+    - '80'
+    - '443'
+    - '8075'
+
+- name: delete default gitlab config file
+  ansible.builtin.file:
+    path: /etc/gitlab/gitlab.rb
+    state: absent
+
+- name: copy over gitlab.rb and reconfigure 
+  ansible.builtin.template:
+    src: gitlab.rb.j2
+    dest: /etc/gitlab/gitlab.rb
+  notify: reconfigure gitlab

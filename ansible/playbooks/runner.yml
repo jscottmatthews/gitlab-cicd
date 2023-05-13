@@ -1,0 +1,13 @@
+- hosts: runner
+  become: true
+  become_user: root
+  vars_files: 
+    - variables.yml
+  # vars: 
+  #   role_dir: "~/projects/gitlab-cicd/ansible/playbooks"
+#   timeout: 900
+  #   reconfig_timeout: 900
+  tasks: 
+  - name: configure runner server
+    include_role:
+      name: "{{ role_dir }}/roles/runner/"
